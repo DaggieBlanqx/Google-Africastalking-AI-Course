@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, Response
 import os
 import africastalking
 
@@ -57,3 +57,45 @@ def send_two_way_sms(message: str, recipient: str):
         print("✅ SMS sent:", response)
     except Exception as e:
         print("❌ SMS failed:", str(e))
+
+
+@sms_bp.route("/delivery-report", methods=["POST"])
+def sms_delivery_report():
+    """
+    Handle SMS delivery reports.
+    Expected form-data payload:
+    {
+      "id": "...",
+      "status": "...",
+      "phoneNumber": "...",
+      "networkCode": "...",
+      "failureReason": "...",
+      "retryCount": "..."
+    }
+    """
+    payload = {key: request.values.get(key) for key in request.values.keys()}
+
+    print("📩 SMS Delivery Report Received:")
+    for key, value in payload.items():
+        print(f"   {key}: {value}")
+
+    return Response("OK", status=200)
+
+
+@sms_bp.route("/opt-out", methods=["POST"])
+def sms_opt_out():
+    """
+    Handle Bulk SMS Opt-Out notifications.
+    Expected form-data payload:
+    {
+      "senderId": "MyBrand",
+      "phoneNumber": "+254711XXXYYY"
+    }
+    """
+    payload = {key: request.values.get(key) for key in request.values.keys()}
+
+    print("🚫 SMS Opt-Out Notification Received:")
+    for key, value in payload.items():
+        print(f"   {key}: {value}")
+
+    return Response("OK", status=200)
