@@ -99,3 +99,35 @@ def sms_opt_out():
         print(f"   {key}: {value}")
 
     return Response("OK", status=200)
+
+
+@sms_bp.route("/subscription", methods=["POST"])
+def sms_subscription():
+    """
+    Handle Premium SMS subscription notifications.
+    Expected form-data payload:
+    {
+      "phoneNumber": "+254711000111",
+      "shortCode": "12345",
+      "keyword": "NEWS",
+      "updateType": "addition" // or "deletion"
+    }
+    """
+    payload = {key: request.values.get(key) for key in request.values.keys()}
+
+    print("⭐ SMS Subscription Notification Received:")
+    for key, value in payload.items():
+        print(f"   {key}: {value}")
+
+    # Example: Extract values
+    phone_number = payload.get("phoneNumber")
+    short_code = payload.get("shortCode")
+    keyword = payload.get("keyword")
+    update_type = payload.get("updateType")
+
+    print(
+        f"➡️ Subscription update for {phone_number}: "
+        f"{update_type.upper()} to '{keyword}' on shortcode {short_code}"
+    )
+
+    return Response("OK", status=200)
