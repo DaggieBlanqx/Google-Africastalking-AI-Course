@@ -17,8 +17,14 @@ run:
 tunnel:
 	ngrok http 9000
 
+lint:
+	ruff check .
 
+lint-fix:
+	ruff check . --fix
 
+format:
+	ruff format .
 
 
 
