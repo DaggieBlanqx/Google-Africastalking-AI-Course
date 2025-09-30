@@ -300,3 +300,70 @@ git commit -m "Initial commit - setup Flask project with dynamic routing"
 Step 16: Next Steps
 - Implement actual logic in each route file to interact with the Africastalking API.
 - Add error handling and logging as needed.
+
+
+# Step 17: Code Quality: Formatting and Linting with Ruff (optional but recommended) 
+- Install Ruff for linting and formatting.
+```bash
+pip install ruff
+```
+
+- Create a configuration file for Ruff (optional).
+```bash
+touch pyproject.toml
+```
+
+- Add the following content to pyproject.toml:
+
+```toml
+[tool.ruff]
+line-length = 88           # Default like Black, can set to 100/120
+target-version = "py312"   # Match your Python version
+extend-select = ["B", "I"] # B = bugbear, I = isort (import sorting)
+ignore = ["E501"]          # Example: ignore long lines if you want
+
+[tool.ruff.format]
+quote-style = "double"     # Format with double quotes like Prettier
+indent-style = "space"     # Tabs = false
+docstring-code-format = true
+```
+
+# Step 18: Run Ruff to check and fix issues
+- To check for issues:
+```bash
+ruff check .
+```
+- To automatically fix issues:
+```bash
+ruff check . --fix
+```
+
+- Format your code:
+```bash
+ruff format .
+```
+
+# Step 19: Add Ruff to your Makefile (optional)
+- Add the following lines to your Makefile:
+```Makefile
+
+
+lint:
+	ruff check .
+
+lint-fix:
+	ruff check . --fix
+
+format:
+	ruff format .
+
+```
+
+- Now you can run:
+```bash
+make lint
+make lint-fix
+make format
+```
+
+
