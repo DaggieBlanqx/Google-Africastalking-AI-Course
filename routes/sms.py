@@ -29,6 +29,10 @@ def twoway_callback():
     date = request.values.get("date")
     sender = request.values.get("from")
 
+    if not linkId or not text or not to or not msg_id or not date or not sender:
+        return "BAD", 400
+    print(f"Received 2-way SMS from {sender}: {text}")
+
     # Respond with a new SMS back to the sender
     send_two_way_sms(
         message=f'This is a response to: "{text}"',
