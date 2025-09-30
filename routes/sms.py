@@ -5,8 +5,9 @@ import africastalking
 sms_bp = Blueprint("sms", __name__)
 
 # --- Africa's Talking Setup ---
+AT_USERNAME = os.getenv("AT_USERNAME")
 AT_API_KEY = os.getenv("AT_API_KEY")
-AT_USERNAME = os.getenv("AT_USERNAME") or "sandbox"  # default for dev
+AT_SHORTCODE = os.getenv("AT_SHORTCODE")
 
 africastalking.initialize(AT_USERNAME, AT_API_KEY)
 sms = africastalking.SMS
@@ -46,14 +47,9 @@ def send_two_way_sms(message: str, recipient: str):
     """
     Send a 2-way SMS using Africa's Talking API.
     """
-    options = {
-        "to": [recipient],
-        "message": message,
-        "from_": "21477",  # your short code or alphanumeric senderId
-    }
 
     try:
-        response = sms.send(options)
+        response = sms.send(message, [recipient], AT_SHORTCODE)
         print("✅ SMS sent:", response)
     except Exception as e:
         print("❌ SMS failed:", str(e))
