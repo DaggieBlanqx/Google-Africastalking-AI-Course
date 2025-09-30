@@ -17,7 +17,7 @@ def get_sms_status():
     return jsonify({"service": "sms", "status": "ready"})
 
 
-@sms_bp.route("/twowaycallback", methods=["POST"])
+@sms_bp.route("/twoway", methods=["POST"])
 def twoway_callback():
     """
     Handle two-way SMS callbacks from Africa's Talking.
