@@ -1,0 +1,57 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.egg-info/
+*.log
+
+# --- Virtual Environments ---
+venv/
+.env/
+.env.bak/
+ENV/
+.venv/
+.venv.bak/
+
+# --- Packaging ---
+build/
+dist/
+*.manifest
+*.spec
+
+# --- Unit test / coverage ---
+.coverage
+.tox/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+htmlcov/
+
+# --- Jupyter / Colab ---
+.ipynb_checkpoints/
+*.ipynb
+
+# --- VSCode / Editors ---
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+
+# --- Env & Secrets ---
+*.env
+.env.local
+.env.development
+.env.production
+secrets.json
+
+# --- Ngrok / Cloudflared ---
+*.ngrok
+*.ngrok.log
+.cloudflared/
