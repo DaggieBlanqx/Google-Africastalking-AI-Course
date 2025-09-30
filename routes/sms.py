@@ -59,7 +59,7 @@ def send_two_way_sms(message: str, recipient: str):
         print("❌ SMS failed:", str(e))
 
 
-@sms_bp.route("/delivery-report", methods=["POST"])
+@sms_bp.route("/delivery-reports", methods=["POST"])
 def sms_delivery_report():
     """
     Handle SMS delivery reports.
