@@ -1,4 +1,4 @@
 Flask==3.0.2
 requests==2.32.3
 ruff==0.4.0
-africastalking==1.2.6   
+africastalking==1.2.6
