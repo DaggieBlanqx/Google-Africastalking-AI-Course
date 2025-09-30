@@ -58,3 +58,40 @@ def check_balance():
 
         # No response expected when isActive != 1
         return Response("", status=200)
+
+
+@voice_bp.route("/status", methods=["POST"])
+def voice_status():
+    """
+    Handle Africa's Talking Voice API notifications:
+    - Outbound calls
+    - Inbound calls
+    - After input (GetDigits, Record)
+    - When call ends
+
+    AT will send a variety of parameters depending on the event type.
+    """
+
+    # Collect all request parameters
+    payload = {key: request.values.get(key) for key in request.values.keys()}
+
+    # Log the notification
+    print("📢 Voice Notification Received:")
+    for key, value in payload.items():
+        print(f"   {key}: {value}")
+
+    # Example: Extract a few key fields for easier debugging
+    session_id = payload.get("sessionId")
+    is_active = payload.get("isActive")
+    direction = payload.get("direction")
+    caller = payload.get("callerNumber")
+    dest = payload.get("destinationNumber")
+    hangup_cause = payload.get("hangupCause")
+
+    print(
+        f"➡️ Session {session_id} | Active={is_active} | Direction={direction} | "
+        f"Caller={caller} | Dest={dest} | HangupCause={hangup_cause}"
+    )
+
+    # Always respond with "OK" (200) so AT knows we received it
+    return Response("OK", status=200)
