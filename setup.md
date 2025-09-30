@@ -247,3 +247,56 @@ make run
 make dev
 make tunnel
 ```
+
+Step 12: Create a .gitignore file (optional but recommended)
+- To avoid committing unnecessary files to version control, create a .gitignore file.
+```bash
+touch .gitignore
+```
+
+- Add the following content to .gitignore:
+
+```
+venv/ # Ignore virtual environment folder
+.env # Ignore environment variable files
+```
+
+Step 13: Create .env.example file (optional but recommended)
+- To provide a template for environment variables, create a .env.example file.
+```bash
+touch .env.example
+```
+
+- Add the following content to .env.example:
+
+```
+# Flask configuration
+FLASK_ENV=development
+PORT=9000
+
+# Ngrok / Cloudflared
+NGROK_AUTHTOKEN=your-ngrok-auth-token-here
+
+# Africastalking API credentials
+USERNAME=your-AT-username-here
+API_KEY=your-AT-api-key-here
+
+```
+
+Step 14: Clone .env.example to .env (optional)
+- Create a .env file from the .env.example file to store your actual environment variables.
+```bash
+cp .env.example .env
+```
+
+Step 15: Initialize a Git repository (optional)
+- If you want to use version control, initialize a Git repository and make your first commit.
+```bash
+git init
+git add .
+git commit -m "Initial commit - setup Flask project with dynamic routing"
+```
+
+Step 16: Next Steps
+- Implement actual logic in each route file to interact with the Africastalking API.
+- Add error handling and logging as needed.
