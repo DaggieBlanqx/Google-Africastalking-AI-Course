@@ -47,6 +47,8 @@ def ussd_handler():
 
 
 ussd_bp.route("/status", methods=["POST"])
+
+
 def ussd_status():
     """
     Handle USSD end-of-session notifications.
