@@ -2,11 +2,13 @@ from flask import Blueprint, request
 
 ussd_bp = Blueprint("ussd", __name__)
 
-@ussd_bp.route("/", methods=['GET'])
+
+@ussd_bp.route("/", methods=["GET"])
 def index():
     return "Welcome to the USSD service"
 
-@ussd_bp.route("/", methods=['POST'])
+
+@ussd_bp.route("/", methods=["POST"])
 def ussd_handler():
     # Read the variables sent via POST from our API
     session_id = request.values.get("sessionId", None)
