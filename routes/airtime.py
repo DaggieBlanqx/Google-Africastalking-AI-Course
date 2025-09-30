@@ -36,3 +36,36 @@ def airtime_validation():
         status = "Failed"
 
     return jsonify({"status": status})
+
+
+@airtime_bp.route("/status", methods=["POST"])
+def airtime_status():
+    """
+    Handle airtime delivery status callbacks.
+    Expected payload:
+    {
+       "phoneNumber":"+254711XXXYYY",
+       "description":"Airtime Delivered Successfully",
+       "status":"Success",
+       "requestId":"ATQid_SampleTxnId123",
+       "discount":"KES 0.6000",
+       "value":"KES 100.0000"
+    }
+    """
+    data = request.get_json(force=True)
+
+    phone_number = data.get("phoneNumber")
+    description = data.get("description")
+    status = data.get("status")
+    request_id = data.get("requestId")
+    discount = data.get("discount")
+    value = data.get("value")
+
+    if not phone_number or not status or not request_id and not discount and not value:
+        return "BAD", 400
+
+    # Log or process the status here
+    print(f"📲 Airtime status update for {phone_number}: {status} ({description})")
+
+    # Respond with 200 OK and body "OK"
+    return "OK", 200
