@@ -2,6 +2,7 @@ import os
 import importlib
 from flask import Blueprint
 
+
 # Dynamically import and register all blueprints from the routes directory
 def register_routes(app):
     routes_dir = os.path.dirname(__file__)
@@ -19,7 +20,6 @@ def register_routes(app):
                 prefix = f"/api/{attr.name}"
                 app.register_blueprint(attr, url_prefix=prefix)
                 print(f"✅ Registered {attr.name} at {prefix}")
-    
 
     @app.route("/", methods=["GET"])
     def index():
