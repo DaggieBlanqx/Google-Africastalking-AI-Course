@@ -17,7 +17,7 @@ _airtime = africastalking.Airtime
 
 
 def send_airtime(
-    phone_number: str, amount: float, currency: str = "KES"
+    phone_number: str, amount: float, currency: str = "KES", idempotencyKey: str = None
 ) -> Dict[str, Any]:
     """
     Send airtime to a phone number using Africa's Talking API.
@@ -36,7 +36,12 @@ def send_airtime(
         )
 
     try:
-        response = _airtime.send(phone_number, amount, currency)
+        response = _airtime.send(
+            phone_number=phone_number,
+            amount=amount,
+            currency_code=currency,
+            idempotency_key=idempotencyKey,
+        )
 
         return response
     except Exception as e:
