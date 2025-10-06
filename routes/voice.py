@@ -9,11 +9,11 @@ def get_voice_status():
     return {"service": "voice", "status": "ready"}
 
 
-@voice_bp.route("/make-call", methods=["GET"])
+@voice_bp.route("/invoke-call", methods=["GET"])
 def make_voice_call():
     """
     Get a query parameter 'phone' to make a call to.
-    E.g., /make-call?phone=2547XXXXXXX
+    E.g., /invoke-call?phone=2547XXXXXXX
     """
 
     phone = "+" + request.args.get("phone", "").strip()
