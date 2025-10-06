@@ -1,21 +1,55 @@
 from flask import Blueprint, jsonify, request, Response
-import os
-import africastalking
+from utils.sms_utils import send_bulk_sms, send_twoway_sms
+
 
 sms_bp = Blueprint("sms", __name__)
-
-# --- Africa's Talking Setup ---
-AT_USERNAME = os.getenv("AT_USERNAME")
-AT_API_KEY = os.getenv("AT_API_KEY")
-AT_SHORTCODE = os.getenv("AT_SHORTCODE")
-
-africastalking.initialize(AT_USERNAME, AT_API_KEY)
-sms = africastalking.SMS
 
 
 @sms_bp.route("/", methods=["GET"])
 def get_sms_status():
     return jsonify({"service": "sms", "status": "ready"})
+
+
+@sms_bp.route("/invoke-bulk-sms", methods=["GET"])
+def invoke_bulk_sms():
+    """
+    Get a query parameter 'phone' and 'message' to send an SMS to.
+    E.g., /invoke-bulk-sms?phone=2547XXXXXXX&message=Hello%20World
+    """
+
+    phone = "+" + request.args.get("phone", "").strip()
+    message = request.args.get("message", "Hello from Africa's Talking!").strip()
+
+    print(f"📩 Request to send SMS to: {phone} with message: {message}")
+    if not phone:
+        return {"error": "Missing 'phone' query parameter"}, 400
+
+    try:
+        response = send_bulk_sms(message, [phone])
+        return {"message": f"SMS sent to {phone}", "response": response}
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+
+@sms_bp.route("/invoke-twoway-sms", methods=["GET"])
+def invoke_twoway_sms():
+    """
+    Get a query parameter 'phone' and 'message' to send an SMS to.
+    E.g., /invoke-twoway-sms?phone=2547XXXXXXX&message=Hello%20World
+    """
+
+    phone = "+" + request.args.get("phone", "").strip()
+    message = request.args.get("message", "Hello from Africa's Talking!").strip()
+
+    print(f"📩 Request to send SMS to: {phone} with message: {message}")
+    if not phone:
+        return {"error": "Missing 'phone' query parameter"}, 400
+
+    try:
+        response = send_twoway_sms(message, phone)
+        return {"message": f"SMS sent to {phone}", "response": response}
+    except Exception as e:
+        return {"error": str(e)}, 500
 
 
 @sms_bp.route("/twoway", methods=["POST"])
@@ -35,24 +69,12 @@ def twoway_callback():
     print(f"Received 2-way SMS from {sender}: {text}")
 
     # Respond with a new SMS back to the sender
-    send_two_way_sms(
+    send_twoway_sms(
         message=f'This is a response to: "{text}"',
         recipient=sender,
     )
 
     return "GOOD", 200
-
-
-def send_two_way_sms(message: str, recipient: str):
-    """
-    Send a 2-way SMS using Africa's Talking API.
-    """
-
-    try:
-        response = sms.send(message, [recipient], AT_SHORTCODE)
-        print("✅ SMS sent:", response)
-    except Exception as e:
-        print("❌ SMS failed:", str(e))
 
 
 @sms_bp.route("/delivery-reports", methods=["POST"])
