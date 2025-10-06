@@ -1,13 +1,7 @@
 from flask import Blueprint, request, Response
+from utils.voice_utils import make_call
 
 voice_bp = Blueprint("voice", __name__)
-
-# Dummy balance data (replace with DB or service lookup later)
-BALANCE_DATA = {
-    "+254711XXXYYY": 100,
-    "+254733YYYZZZ": 150,
-    "+254711000ZZZ": 190,
-}
 
 
 @voice_bp.route("/", methods=["GET"])
@@ -15,82 +9,78 @@ def get_voice_status():
     return {"service": "voice", "status": "ready"}
 
 
-@voice_bp.route("/check-balance", methods=["POST"])
-def check_balance():
+@voice_bp.route("/make-call", methods=["GET"])
+def make_voice_call():
     """
-    Handle voice callback for checking balance.
-    Africa's Talking will POST sessionId, isActive, callerNumber, etc.
+    Get a query parameter 'phone' to make a call to.
+    E.g., /make-call?phone=2547XXXXXXX
+    """
+
+    phone = "+" + request.args.get("phone", "").strip()
+
+    print(f"📞 Request to call: {phone}")
+    if not phone:
+        return {"error": "Missing 'phone' query parameter"}, 400
+
+    try:
+        response = make_call(phone)
+        return {"message": f"Call initiated to {phone}", "response": response}
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+
+@voice_bp.route("/instruct", methods=["POST"])
+def voice_instruct():
+    """
+    Handle Africa's Talking Voice API call instructions.
+    This endpoint is called when a call is answered to get the next set of instructions.
     """
 
     session_id = request.values.get("sessionId")
-    is_active = request.values.get("isActive")
+    caller_number = request.values.get("callerNumber")
+    destination_number = request.values.get("destinationNumber")
 
-    if is_active == "1":
-        caller_number = request.values.get("callerNumber")
+    print(
+        f"📞 Call answered. Session: {session_id}, Caller: {caller_number}, "
+        f"Destination: {destination_number}"
+    )
 
-        # Check balance
-        if caller_number in BALANCE_DATA:
-            balance = BALANCE_DATA[caller_number]
-            text = f"Your balance is {balance} shillings. Good bye."
-        else:
-            text = (
-                "Sorry, your phone number is not registered for this service. Good Bye."
-            )
+    # Example instructions: Greet the caller and end the call
+    response = '<?xml version="1.0" encoding="UTF-8"?>'
+    response += "<Response>"
+    response += (
+        "<Say>Welcome to the service. This is a demo voice application. Goodbye.</Say>"
+    )
+    response += "</Response>"
 
-        # Build XML response
-        response = '<?xml version="1.0" encoding="UTF-8"?>'
-        response += "<Response>"
-        response += f"<Say>{text}</Say>"
-        response += "</Response>"
-
-        return Response(response, mimetype="text/plain")
-
-    else:
-        # Call has ended — log details if needed
-        duration = request.values.get("durationInSeconds")
-        currency = request.values.get("currencyCode")
-        amount = request.values.get("amount")
-
-        print(
-            f"📞 Call ended. Session: {session_id}, Duration: {duration}s, "
-            f"Cost: {amount} {currency}"
-        )
-
-        # No response expected when isActive != 1
-        return Response("", status=200)
+    return Response(response, mimetype="text/plain")
 
 
-@voice_bp.route("/status", methods=["POST"])
-def voice_status():
+@voice_bp.route("/events", methods=["POST"])
+def voice_events():
     """
-    Handle Africa's Talking Voice API notifications:
-    - Outbound calls
-    - Inbound calls
-    - After input (GetDigits, Record)
-    - When call ends
-
-    AT will send a variety of parameters depending on the event type.
+    Handle Africa's Talking Voice API call events.
+    This endpoint receives events like call started, ended, failed, etc.
     """
 
     # Collect all request parameters
     payload = {key: request.values.get(key) for key in request.values.keys()}
 
-    # Log the notification
-    print("📢 Voice Notification Received:")
+    # Log the event
+    print("📢 Voice Event Received:")
     for key, value in payload.items():
         print(f"   {key}: {value}")
 
     # Example: Extract a few key fields for easier debugging
     session_id = payload.get("sessionId")
-    is_active = payload.get("isActive")
-    direction = payload.get("direction")
+    event_type = payload.get("eventType")
     caller = payload.get("callerNumber")
     dest = payload.get("destinationNumber")
     hangup_cause = payload.get("hangupCause")
 
     print(
-        f"➡️ Session {session_id} | Active={is_active} | Direction={direction} | "
-        f"Caller={caller} | Dest={dest} | HangupCause={hangup_cause}"
+        f"➡️ Session {session_id} | EventType={event_type} | Caller={caller} | "
+        f"Dest={dest} | HangupCause={hangup_cause}"
     )
 
     # Always respond with "OK" (200) so AT knows we received it
