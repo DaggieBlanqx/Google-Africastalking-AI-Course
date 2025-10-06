@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from utils.airtime_utils import send_airtime
 
 airtime_bp = Blueprint("airtime", __name__)
 
@@ -6,6 +7,42 @@ airtime_bp = Blueprint("airtime", __name__)
 @airtime_bp.route("/", methods=["GET"])
 def get_airtime_status():
     return jsonify({"service": "airtime", "status": "ready"})
+
+
+"""
+Send airtime to a phone number using Africa's Talking API.
+Take in phone and amount as query parameters.
+Example: /invoke/send-airtime?phone=+254711XXXYYY&amount=100
+
+Optional:
+idempotencyKey
+currency=KES (default)
+"""
+
+
+@airtime_bp.route("/invoke-send-airtime", methods=["GET"])
+def invoke_send_airtime():
+    phone = "+" + request.args.get("phone", "").strip()
+    amount = request.args.get("amount", "10").strip()
+    currency = request.args.get("currency", "KES").strip()
+    idempotencyKey = request.args.get("idempotencyKey", "ABCDEF").strip()
+
+    print(f"📲 Request to send airtime to: {phone} with amount: {amount}")
+    if not phone:
+        return {"error": "Missing 'phone' query parameter"}, 400
+
+    try:
+        amount_value = float(amount)
+        if amount_value <= 0:
+            return {"error": "'amount' must be a positive number"}, 400
+    except ValueError:
+        return {"error": "'amount' must be a valid number"}, 400
+
+    try:
+        response = send_airtime(phone, amount_value, currency, idempotencyKey or None)
+        return {"message": f"Airtime sent to {phone}", "response": response}
+    except Exception as e:
+        return {"error": str(e)}, 500
 
 
 @airtime_bp.route("/validation", methods=["POST"])
