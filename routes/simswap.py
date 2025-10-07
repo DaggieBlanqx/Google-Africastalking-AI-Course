@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from utils.simswap_utils import check_simswap
 
 simswap_bp = Blueprint("sim-swap", __name__)
 
@@ -6,6 +7,21 @@ simswap_bp = Blueprint("sim-swap", __name__)
 @simswap_bp.route("/", methods=["GET"])
 def get_simswap_status():
     return {"service": "sim-swap", "status": "ready"}
+
+
+@simswap_bp.route("/invoke-check-simswap", methods=["GET"])
+def invoke_check_simswap():
+    phone = "+" + request.args.get("phone", "").strip()
+
+    print(f"📲 Request to check sim swap state for: {phone}")
+    if not phone:
+        return {"error": "Missing 'phone' query parameter"}, 400
+
+    try:
+        response = check_simswap(phone)
+        return {"message": f"Sim swap check invoked for {phone}", "response": response}
+    except Exception as e:
+        return {"error": str(e)}, 500
 
 
 @simswap_bp.route("/status", methods=["POST"])
